@@ -1,19 +1,22 @@
 package wordcount;
 
 import wordcount.counter.DefaultWordFrequencyCounter;
-import wordcount.validator.DefaultWordValidator;
+import wordcount.validator.AlphabeticOnlyWordValidator;
 
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Scanner;
 
+/**
+ * A simple application main to provide access to the Word Count Service.
+ */
 public class WordCounter {
 
     public static void main(String[] args) {
 
         WordCountService wordCountService = new DefaultWordCounterService(
                 new DefaultWordFrequencyCounter(),
-                new DefaultWordValidator(),
+                new AlphabeticOnlyWordValidator(),
                 (word, lang) -> word); // no translator available yet
 
        // just use English only for now, as no translation available

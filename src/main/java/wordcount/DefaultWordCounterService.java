@@ -7,7 +7,6 @@ import wordcount.validator.WordValidator;
 
 import java.util.Locale;
 
-
 public class DefaultWordCounterService implements WordCountService {
 
     private WordFrequencyCounter frequencyCounter;
