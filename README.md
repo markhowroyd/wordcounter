@@ -7,3 +7,5 @@ otherwise words may be ambiguous e.g. "chat" may be an English word or else Fren
 case where, in a real system, requirements should be expanded appropriately and work done to the
 translator (API) in collaboration with the 3rd party team, or alternate translator used. The upshot of
 not doing this is to record a significant number of potentially incorrect counts.
+
+A validator (dictionary) of valid, permissible English words may be needed additionally.
