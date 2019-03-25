@@ -11,6 +11,9 @@ import wordcount.validator.InvalidWordException;
 import wordcount.validator.WordValidator;
 
 import java.util.Locale;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class DefaultWordCounterServiceTest {
@@ -34,7 +37,7 @@ public class DefaultWordCounterServiceTest {
     }
 
     @Test
-    public void givenAnInitializedCounterService_whenEnglishWordIsAdded_thenResultIsCorrect() throws WordCounterServiceException, InvalidWordException {
+    public void givenANewCounterService_whenEnglishWordIsAdded_thenItSucceeds() throws InvalidWordException {
         String word = "test";
         String language = Locale.ENGLISH.getISO3Language();
 
@@ -46,7 +49,7 @@ public class DefaultWordCounterServiceTest {
     }
 
     @Test
-    public void givenAnInitializedCounterService_whenForeignWordIsAdded_thenResultIsCorrect() throws InvalidWordException, WordCounterServiceException {
+    public void givenANewCounterService_whenForeignWordIsAdded_thenItSucceeds() throws InvalidWordException {
         String word = "test";
         String language = Locale.FRENCH.getISO3Language();
 
@@ -56,8 +59,62 @@ public class DefaultWordCounterServiceTest {
         wordCounterService.addWord(word, language);
 
         verify(validator).assertValid(word);
-        verify(translator).translate(word,language);
+        verify(translator).translate(word, language);
         verify(frequencyCounter).addWordOccurrence(translatedWord);
         verifyNoMoreInteractions(validator, translator, frequencyCounter);
+    }
+
+    @Test
+    public void givenANewCounterService_whenWordIsBad_thenExceptionThrown() throws InvalidWordException {
+        String word = "test";
+        String language = Locale.FRENCH.getISO3Language();
+        doThrow(new InvalidWordException("bad word")).when(validator).assertValid(word);
+
+        try {
+            wordCounterService.addWord(word, language);
+            fail("Exception was expected");
+        } catch (WordCounterServiceException e) {
+            assertThat(e.getCause()).isInstanceOf(InvalidWordException.class);
+        }
+
+        verify(validator).assertValid(word);
+        verifyNoMoreInteractions(validator, translator, frequencyCounter);
+    }
+
+    @Test
+    public void givenANewCounterService_whenWordIsNull_thenItFailsFast() {
+        try {
+            wordCounterService.addWord(null, Locale.FRENCH.getISO3Language());
+        } catch (NullPointerException e) {
+            assertThat(e).isInstanceOf(NullPointerException.class).hasMessageContaining("The supplied word must not be null");
+        }
+    }
+
+    @Test
+    public void givenANewCounterService_whenLanguageIsNull_thenItFailsFast()  {
+        try {
+            wordCounterService.addWord("test", null);
+        } catch (NullPointerException e) {
+            assertThat(e).isInstanceOf(NullPointerException.class).hasMessageContaining("The supplied language must not be null");
+        }
+    }
+
+    @Test
+    public void givenANewCounterService_whenWordIsQueried_thenItSucceeds() {
+        String word = "test";
+
+        wordCounterService.getWordFrequency(word);
+
+        verify(frequencyCounter).getOccurrenceCount(word);
+        verifyNoMoreInteractions(validator, translator, frequencyCounter);
+    }
+
+    @Test
+    public void givenANewCounterService_whenQueriedWordIsNull_thenItFailsFast() {
+        try {
+            wordCounterService.getWordFrequency(null);
+        } catch (NullPointerException e) {
+            assertThat(e).isInstanceOf(NullPointerException.class).hasMessageContaining("The supplied word must not be null");
+        }
     }
 }

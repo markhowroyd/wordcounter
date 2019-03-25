@@ -5,5 +5,5 @@ package wordcount;
  */
 public interface WordCountService extends WordCountQueryService {
 
-    void addWord(String word, String isoLanguageCode) throws WordCounterServiceException;
+    void addWord(String word, String isoLanguageCode);
 }

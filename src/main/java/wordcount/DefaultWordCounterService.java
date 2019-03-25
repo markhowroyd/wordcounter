@@ -6,6 +6,7 @@ import wordcount.validator.InvalidWordException;
 import wordcount.validator.WordValidator;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class DefaultWordCounterService implements WordCountService {
 
@@ -22,8 +23,11 @@ public class DefaultWordCounterService implements WordCountService {
     }
 
     @Override
-    public void addWord(String word, String isoLanguageCode) throws WordCounterServiceException {
+    public void addWord(String word, String isoLanguageCode) {
+        Objects.requireNonNull(word, "The supplied word must not be null");
+        Objects.requireNonNull(isoLanguageCode, "The supplied language must not be null");
         try {
+            Objects.requireNonNull(isoLanguageCode);
             wordValidator.assertValid(word);
             String theWord = isoLanguageCode.equals(Locale.ENGLISH.getISO3Language()) ? word : translator.translate(word, isoLanguageCode);
             frequencyCounter.addWordOccurrence(theWord);
@@ -35,6 +39,7 @@ public class DefaultWordCounterService implements WordCountService {
 
     @Override
     public int getWordFrequency(String word) {
+        Objects.requireNonNull(word, "The supplied word must not be null");
         return frequencyCounter.getOccurrenceCount(word);
     }
 }
